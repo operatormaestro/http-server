@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.example.Utilites.Response.sendClassicResponse;
@@ -16,14 +19,15 @@ import static org.example.Utilites.Response.sendOkResponse;
 
 public class Runner implements Runnable {
     private final Socket socket;
+    private final Map<String, Map<String, Handler>> handlers;
 
-    public Runner(Socket socket) {
+    public Runner(Socket socket, Map<String, Map<String, Handler>> handlers) {
         this.socket = socket;
+        this.handlers = handlers;
     }
 
     @Override
     public void run() {
-        System.out.println("Thread name of the current connection: " + Thread.currentThread().getName());
         try (
                 final var in = new BufferedInputStream(socket.getInputStream());
                 final var out = new BufferedOutputStream(socket.getOutputStream())) {
@@ -38,9 +42,23 @@ public class Runner implements Runnable {
                 } else {
                     sendOkResponse(filePath, mimeType, out);
                 }
+                String method = request.getRequestLine().getMethod();
+                if (handlers.containsKey(method)) {
+                    List<String> list = new ArrayList<>();
+                    for (Map.Entry entry : handlers.entrySet()) {
+                        list.add((String) entry.getKey());
+                    }
+                    if (!list.contains(path)) {
+                        handlers.get(method).get(path).handle(request, out);
+                    }
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Map<String, Map<String, Handler>> getHandlers() {
+        return handlers;
     }
 }

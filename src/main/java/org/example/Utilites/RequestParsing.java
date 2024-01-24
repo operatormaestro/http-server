@@ -1,6 +1,7 @@
 package org.example.Utilites;
 
-import org.example.Request.*;
+import org.example.Request.Request;
+import org.example.Request.RequestLine;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
