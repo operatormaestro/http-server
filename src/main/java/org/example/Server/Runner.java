@@ -37,11 +37,6 @@ public class Runner implements Runnable {
                 final var path = request.getRequestLine().getPath();
                 final var filePath = Path.of(".", "public", path);
                 final var mimeType = Files.probeContentType(filePath);
-                if (path.contains("/classic.html")) {
-                    sendClassicResponse(filePath, mimeType, out);
-                } else {
-                    sendOkResponse(filePath, mimeType, out);
-                }
                 String method = request.getRequestLine().getMethod();
                 if (handlers.containsKey(method)) {
                     List<String> list = new ArrayList<>();
@@ -52,13 +47,15 @@ public class Runner implements Runnable {
                         handlers.get(method).get(path).handle(request, out);
                     }
                 }
+                if (path.contains("/classic.html")) {
+                    sendClassicResponse(filePath, mimeType, out);
+                } else {
+                    sendOkResponse(filePath, mimeType, out);
+                }
+
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public Map<String, Map<String, Handler>> getHandlers() {
-        return handlers;
     }
 }

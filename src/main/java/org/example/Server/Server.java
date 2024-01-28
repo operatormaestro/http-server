@@ -1,5 +1,7 @@
 package org.example.Server;
 
+import org.example.Utilites.RequestParsing;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -38,10 +40,12 @@ public class Server {
             for (Map.Entry entry : handlers.entrySet()) {
                 list.add((String) entry.getKey());
             }
+
             if (!list.contains(path)) {
                 Map<String, Handler> map = new ConcurrentHashMap<>();
                 map.put(path, handler);
                 handlers.put(method, map);
+                RequestParsing.addValidPath(path);
             }
         }
     }
