@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,12 +37,10 @@ public class Runner implements Runnable {
                 final var mimeType = Files.probeContentType(filePath);
                 String method = request.getRequestLine().getMethod();
                 if (handlers.containsKey(method)) {
-                    List<String> list = new ArrayList<>();
-                    for (Map.Entry entry : handlers.entrySet()) {
-                        list.add((String) entry.getKey());
-                    }
-                    if (!list.contains(path)) {
+                    Map<String, Handler> map = handlers.get(method);
+                    if (map.containsKey(path)) {
                         handlers.get(method).get(path).handle(request, out);
+                        return;
                     }
                 }
                 if (path.contains("/classic.html")) {
@@ -52,7 +48,6 @@ public class Runner implements Runnable {
                 } else {
                     sendOkResponse(filePath, mimeType, out);
                 }
-
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

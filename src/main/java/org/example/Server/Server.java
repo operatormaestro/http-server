@@ -4,8 +4,6 @@ import org.example.Utilites.RequestParsing;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -36,17 +34,19 @@ public class Server {
 
     public void addHandler(String method, String path, Handler handler) {
         if (!handlers.containsKey(method)) {
-            List<String> list = new ArrayList<>();
-            for (Map.Entry entry : handlers.entrySet()) {
-                list.add((String) entry.getKey());
-            }
-
-            if (!list.contains(path)) {
-                Map<String, Handler> map = new ConcurrentHashMap<>();
-                map.put(path, handler);
-                handlers.put(method, map);
-                RequestParsing.addValidPath(path);
+            putMap(method, path, handler);
+        } else {
+            Map<String, Handler> map = handlers.get(method);
+            if (!map.containsKey(path)) {
+                putMap(method, path, handler);
             }
         }
+    }
+
+    public void putMap(String method, String path, Handler handler) {
+        Map<String, Handler> map = new ConcurrentHashMap<>();
+        map.put(path, handler);
+        handlers.put(method, map);
+        RequestParsing.addValidPath(path);
     }
 }

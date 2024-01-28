@@ -20,7 +20,7 @@ public class Main {
                 final var template = Files.readString(filePath);
                 final var content = template.replace(
                         "{time}",
-                        LocalDateTime.now().toString()).getBytes();
+                        LocalDateTime.now().plusHours(1).toString()).getBytes();
                 final var requestTimer =
                         ("HTTP/1.1 200 OK\r\n" +
                                 "Content-Type: " + mimeType + "\r\n" +
@@ -37,7 +37,7 @@ public class Main {
             }
         };
 
-        server.addHandler("GET", "/messages/timer.html", handler);
+        server.addHandler("GET", "/messages/timer.html", handler); //для проверки работоспособности)
         server.addHandler("POST", "/messages", handler);
         server.listenPort();
     }
