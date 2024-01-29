@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.example.Utilites.Response.sendClassicResponse;
@@ -16,14 +17,15 @@ import static org.example.Utilites.Response.sendOkResponse;
 
 public class Runner implements Runnable {
     private final Socket socket;
+    private final Map<String, Map<String, Handler>> handlers;
 
-    public Runner(Socket socket) {
+    public Runner(Socket socket, Map<String, Map<String, Handler>> handlers) {
         this.socket = socket;
+        this.handlers = handlers;
     }
 
     @Override
     public void run() {
-        System.out.println("Thread name of the current connection: " + Thread.currentThread().getName());
         try (
                 final var in = new BufferedInputStream(socket.getInputStream());
                 final var out = new BufferedOutputStream(socket.getOutputStream())) {
@@ -33,6 +35,14 @@ public class Runner implements Runnable {
                 final var path = request.getRequestLine().getPath();
                 final var filePath = Path.of(".", "public", path);
                 final var mimeType = Files.probeContentType(filePath);
+                String method = request.getRequestLine().getMethod();
+                if (handlers.containsKey(method)) {
+                    Map<String, Handler> map = handlers.get(method);
+                    if (map.containsKey(path)) {
+                        handlers.get(method).get(path).handle(request, out);
+                        return;
+                    }
+                }
                 if (path.contains("/classic.html")) {
                     sendClassicResponse(filePath, mimeType, out);
                 } else {

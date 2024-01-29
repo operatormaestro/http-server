@@ -1,6 +1,7 @@
 package org.example.Utilites;
 
-import org.example.Request.*;
+import org.example.Request.Request;
+import org.example.Request.RequestLine;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -8,13 +9,15 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RequestParsing {
 
+    static List<String > validPaths = Stream.of("/index.html", "/spring.svg", "/spring.png", "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js").collect(Collectors.toList());
 
     public static Optional<Request> parseRequest(BufferedInputStream in, BufferedOutputStream out) throws IOException {
         final int limit = 4096;
-        final var validPaths = List.of("/index.html", "/spring.svg", "/spring.png", "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
 
         in.mark(limit);
         final byte[] buffer = new byte[limit];
@@ -91,6 +94,9 @@ public class RequestParsing {
             return i;
         }
         return -1;
+    }
+    public static void addValidPath (String path) {
+       validPaths.add(path);
     }
 
 }
