@@ -13,6 +13,8 @@ public class Main {
         Server server = new Server(9999);
 
         Handler handler = (request, out) -> {
+            System.out.println(request.getQueryParams()); //ссылка для проверки : http://localhost:9999/messages/timer.html?list=10&name=igor
+            System.out.println(request.getQueryParam(request.getQueryParams().get(0).getName()));
             try {
                 final var path = request.getRequestLine().getPath();
                 final var filePath = Path.of(".", "public", path);
@@ -33,10 +35,10 @@ public class Main {
                 out.flush();
 
             } catch (IOException e) {
+                //noinspection CallToPrintStackTrace
                 e.printStackTrace();
             }
         };
-
         server.addHandler("GET", "/messages/timer.html", handler); //для проверки работоспособности)
         server.addHandler("POST", "/messages", handler);
         server.listenPort();

@@ -20,10 +20,12 @@ public class Server {
 
     public void listenPort() {
         try (final var serverSocket = new ServerSocket(port)) {
+            //noinspection InfiniteLoopStatement
             while (true) {
                 try {
                     pool.execute(new Runner(serverSocket.accept(), handlers));
                 } catch (Exception e) {
+                    //noinspection CallToPrintStackTrace
                     e.printStackTrace();
                 }
             }
