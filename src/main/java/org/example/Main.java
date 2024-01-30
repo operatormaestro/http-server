@@ -1,6 +1,5 @@
 package org.example;
 
-import org.example.Request.Request;
 import org.example.Server.Handler;
 import org.example.Server.Server;
 
@@ -14,10 +13,9 @@ public class Main {
         Server server = new Server(9999);
 
         Handler handler = (request, out) -> {
-            System.out.println(request.getQueryParams());
-            System.out.println(request.getQueryParam(String.valueOf(request.getQueryParams().get(0))));
+            System.out.println(request.getQueryParams()); //ссылка для проверки : http://localhost:9999/messages/timer.html?list=10&name=igor
+            System.out.println(request.getQueryParam(request.getQueryParams().get(0).getName()));
             try {
-                System.out.println(request.getQueryParams());
                 final var path = request.getRequestLine().getPath();
                 final var filePath = Path.of(".", "public", path);
                 final var mimeType = Files.probeContentType(filePath);
@@ -37,6 +35,7 @@ public class Main {
                 out.flush();
 
             } catch (IOException e) {
+                //noinspection CallToPrintStackTrace
                 e.printStackTrace();
             }
         };

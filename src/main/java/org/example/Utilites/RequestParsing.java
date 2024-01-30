@@ -21,6 +21,7 @@ public class RequestParsing {
 
     static List<String> validPaths = Stream.of("/index.html", "/spring.svg", "/spring.png", "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js").collect(Collectors.toList());
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static Optional<Request> parseRequest(BufferedInputStream in, BufferedOutputStream out) throws IOException, URISyntaxException {
         final int limit = 4096;
 
@@ -29,7 +30,7 @@ public class RequestParsing {
         final int read = in.read(buffer);
         Optional<List<NameValuePair>> queryParams = Optional.empty();
         RequestLine requestLine;
-        Request request = null;
+        Request request;
 
         final byte[] requestLineDelimiter = new byte[]{'\r', '\n'};
         final int requestLineEnd = indexOf(buffer, requestLineDelimiter, 0, read);
@@ -77,7 +78,7 @@ public class RequestParsing {
 
         if (!requestLine.getMethod().equals("GET")) {
             in.skip(headersDelimiter.length);
-            final Optional<String> contentLength = extractHeader(headers, "Content-Length");
+            final Optional<String> contentLength = extractHeader(headers);
             if (contentLength.isPresent()) {
                 final int length = Integer.parseInt(contentLength.get());
                 final byte[] bodyBytes = in.readNBytes(length);
@@ -93,9 +94,9 @@ public class RequestParsing {
         return Optional.ofNullable(request);
     }
 
-    private static Optional<String> extractHeader(List<String> headers, String header) {
+    private static Optional<String> extractHeader(List<String> headers) {
         return headers.stream()
-                .filter(o -> o.startsWith(header))
+                .filter(o -> o.startsWith("Content-Length"))
                 .map(o -> o.substring(o.indexOf(" ")))
                 .map(String::trim)
                 .findFirst();

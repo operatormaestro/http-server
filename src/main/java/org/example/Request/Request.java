@@ -9,7 +9,7 @@ public class Request {
     private final RequestLine requestLine;
     private final List<String> headers;
     private final String body;
-    private List<NameValuePair> queryParams;
+    private final List<NameValuePair> queryParams;
 
 
     private Request(RequestBuilder requestBuilder) {
@@ -19,6 +19,7 @@ public class Request {
         queryParams = requestBuilder.queryParams;
 
     }
+
     public RequestLine getRequestLine() {
         return requestLine;
     }
@@ -32,10 +33,6 @@ public class Request {
                 .filter(o -> o.getName().startsWith(param))
                 .map(NameValuePair::getValue)
                 .collect(Collectors.toList());
-    }
-
-    public void setQueryParams(List<NameValuePair> queryParams) {
-        this.queryParams = queryParams;
     }
 
     public static class RequestBuilder {
