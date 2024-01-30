@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.Request.Request;
 import org.example.Server.Handler;
 import org.example.Server.Server;
 
@@ -13,7 +14,10 @@ public class Main {
         Server server = new Server(9999);
 
         Handler handler = (request, out) -> {
+            System.out.println(request.getQueryParams());
+            System.out.println(request.getQueryParam(String.valueOf(request.getQueryParams().get(0))));
             try {
+                System.out.println(request.getQueryParams());
                 final var path = request.getRequestLine().getPath();
                 final var filePath = Path.of(".", "public", path);
                 final var mimeType = Files.probeContentType(filePath);
@@ -36,7 +40,6 @@ public class Main {
                 e.printStackTrace();
             }
         };
-
         server.addHandler("GET", "/messages/timer.html", handler); //для проверки работоспособности)
         server.addHandler("POST", "/messages", handler);
         server.listenPort();
