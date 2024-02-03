@@ -36,7 +36,7 @@ public class Main {
                 e.printStackTrace();
             }
         };
-
+//commentires
         server.addHandler("GET", "/messages/timer.html", handler); //для проверки работоспособности)
         server.addHandler("POST", "/messages", handler);
         server.listenPort();
